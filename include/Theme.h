@@ -11,27 +11,46 @@ class theme
 {
     theme() = default;
     friend class theme_parser;
-    enum class Theme_object { IMAGE, FONT, COLOR, SOUND };
 
 public:
 
-    enum class DEFAULT
+    enum class DEFAULT_FONTS
     {
-        PRIMARY, SECONDARY, BG_VIEW_PRIMARY, BG_VIEW_SECONDARY, FG_VIEW_PRIMARY, FG_VIEW_SECONDARY
-        , FG_TEXT_PRIMARY, FG_TEXT_SECONDARY, FG_LINK_PRIMARY, FG_LINK_SECONDARY, NONE
+        HEADING, SUBHEADING , LINK, PARAGRAPH, LABEL, HIGHLIGHT
     };
+
+    enum class DEFAULT_COLOR
+    {
+        MAIN_BG_COLOR, SUB_BG_COLOR, MAIN_FG_COLOR, SUB_FG_COLOR, WARNING, SUCCESS, ERROR, INFO
+    };
+
+
+    enum class DEFAULT_IMAGE
+    {
+        MAIN_BG_IMG, SUB_BG_IMG, MAIN_FG_IMG, SUB_FG_IMG
+    };
+
+    enum class DEFAULT_SOUNDS
+    {
+        WARNING, NOTIFICATION, SUCCESS, THEME
+    };
+
 
 
     struct FONT_NODE { int font_size; TTF_Font* font; };
     struct IMG_NODE { std::string path; SDL_Texture* img = nullptr; };
     struct COLOR_NODE { SDL_Color color; };
+    struct SOUND_NODE { Mix_Chunk* color; };
+
 private:
     struct FONT_STACK { std::string path; std::list<FONT_NODE> fonts; };
 
     std::unordered_map<std::string, IMG_NODE> images;
     std::unordered_map<std::string, FONT_STACK> fonts;
     std::unordered_map<std::string, COLOR_NODE> colors;
-    std::map<Theme_object, std::map<DEFAULT, std::string>> defaults;
+    std::unordered_map<std::string, SOUND_NODE> sounds;
+    
+
 
     SDL_Renderer* renderer = nullptr;
     static theme* instance;

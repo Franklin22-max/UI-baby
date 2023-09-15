@@ -36,7 +36,7 @@ inline SDL_Surface* LOAD_IMAGE(const std::string path)
     * \param  the source
     * \param  how deep trimming should be , should be b/w (0 - 100)
     * \ return a trimmed surface or null on failure
-    * \ note  should manually free returned surface
+    * \ note  you should manually free returned surface
     */
 inline SDL_Surface* make_round_edges(SDL_Surface* src, float percentage)
 {
@@ -48,8 +48,8 @@ inline SDL_Surface* make_round_edges(SDL_Surface* src, float percentage)
 
     SDL_Surface* dest = SDL_CreateRGBSurfaceWithFormat(0, std::min(d,src->w), std::min(d,src->h), 0,SDL_PIXELFORMAT_RGBA8888);
 
-    int __h = (src->h - std::min(d,src->h))/2.f;
-    int __w = (src->w - std::min(d,src->w))/2.f;
+    int __y = (src->h - std::min(d,src->h))/2.f;
+    int __x = (src->w - std::min(d,src->w))/2.f;
 
     if(dest)
     {
@@ -60,8 +60,8 @@ inline SDL_Surface* make_round_edges(SDL_Surface* src, float percentage)
         {
             for(int j = 0; j < src->w; j++)// x - axis
             {
-                if(sqrt((i - y)*(i - y)  + (j - x)*(j - x)) < r )
-                    dest_ptr[(i - __h) * dest->w + (j - __w)] = src_ptr[i * src->w + j];
+                if((i - y)*(i - y)  + (j - x)*(j - x) < r * r )
+                    dest_ptr[(i - __y) * dest->w + (j - __x)] = src_ptr[i * src->w + j];
             }
         }
     }
@@ -71,30 +71,17 @@ inline SDL_Surface* make_round_edges(SDL_Surface* src, float percentage)
 
 inline void fill_circle(int x, int y, int r,  SDL_Surface* __surface, SDL_Color color)
 {
-    if( x + r > 0 && x - r < __surface->w && r > 0 && y + r > 0 && y - r < __surface->h)
-    {
-        int d = r + r;
-        int count = 0;
-        int _y = y - r;
+    int d = r + r;
 
-        for(int i = 0; i < d; i++)// y-axis
+    for(int i = 0; i < d; i++)// y-axis
+    {
+        for(int j = 0; j < d; j++)
         {
-            for(int j = 0; j < r; j++)
+            // check if point is inside circle
+            if((x - j)*(x - j) + (y - i)*(y - i) <= r*r)
             {
-                // check if point is inside circle
-                if(fabs(((x + j) - x)*((x + j) - x) + ((_y + i) - y)*((_y + i) - y)) <= r*r)
-                {
-                    // fill right hand side on the x-axis
-                    putPixel(__surface,((x + j)), _y + i, color);
-                    count++;
-                }
-                else
-                    break;
+                putPixel(__surface,((x - r) + j), y - r + i, color);
             }
-            // fill the left hand side on the x-axis
-            for(int j = 0; j < count; j++)
-                putPixel(__surface,(x - j), _y + i, color);
-            count = 0;
         }
     }
 }
